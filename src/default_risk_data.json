@@ -1,0 +1,39 @@
+{
+  "results": [
+    {
+      "area_level": "Layer",
+      "area_name": "Risk Layer",
+      "name": "Fire",
+      "value": "3.5%",
+      "value_unit": null
+    },
+    {
+      "area_level": "Layer",
+      "area_name": "Risk Layer",
+      "name": "Flood",
+      "value": "0.6%",
+      "value_unit": null
+    },
+    {
+      "area_level": "Layer",
+      "area_name": "Risk Layer",
+      "name": "Heritage",
+      "value": "10%",
+      "value_unit": null
+    },
+    {
+      "area_level": "Layer",
+      "area_name": "Risk Layer",
+      "name": "Public Housing",
+      "value": "5.6%",
+      "value_unit": "Properties Proportion"
+    },
+    {
+      "area_level": "Layer",
+      "area_name": "Risk Layer",
+      "name": "Public Housing",
+      "value": "12.9%",
+      "value_unit": "Properties Proportion"
+    }
+  ]
+}
