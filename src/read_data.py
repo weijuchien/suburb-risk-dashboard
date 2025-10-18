@@ -54,7 +54,7 @@ def _infer_value_kind(value: str) -> str:
     return "categorical"
 
 
-def _normalise_payload(records: Iterable[Dict[str, Any]]) -> List[RiskRecord]:
+def normalise_payload(records):
     """Convert raw payload rows into RiskRecord objects."""
     results: List[RiskRecord] = []
     for row in records:
@@ -73,12 +73,12 @@ def _normalise_payload(records: Iterable[Dict[str, Any]]) -> List[RiskRecord]:
 
 
 def fetch_risk_data(
-    suburb_name: str,
+    suburb_name,
     *,
-    session: Optional[requests.Session] = None,
-    timeout: int = 10,
-    fallback_path: Optional[str] = None,
-) -> List[RiskRecord]:
+    session=None,
+    timeout=10,
+    fallback_path="src/default_risk_data.json",
+):
     """Fetch risk data for the requested suburb."""
 
     suburb = suburb_name.replace(" ", "+")
@@ -109,14 +109,14 @@ def fetch_risk_data(
     if "results" not in payload:
         raise ValueError("Unexpected payload from risk endpoint: 'results' missing")
 
-    return _normalise_payload(payload["results"])
+    return normalise_payload(payload["results"])
 
 
 def load_risk_data_from_file(path: str) -> List[RiskRecord]:
     """Load risk records from a JSON file with the sandbox response format."""
     with open(path, "r", encoding="utf-8") as handle:
         payload = json.load(handle)
-    return _normalise_payload(payload.get("results", []))
+    return normalise_payload(payload.get("results", []))
 
 
 def risk_records_to_frame(records: Iterable[RiskRecord]) -> pd.DataFrame:

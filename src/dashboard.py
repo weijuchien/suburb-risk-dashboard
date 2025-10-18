@@ -7,6 +7,7 @@ Run with:
 
 from __future__ import annotations
 
+from multiprocessing import Value
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -15,7 +16,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 from src.livability_score import compute_scores
-from src.read_data import RiskDataError, fetch_risk_data, risk_records_to_frame
+from src.read_data import fetch_risk_data, risk_records_to_frame
 
 APP_TITLE = "Livability Score Dashboard"
 FALLBACK_JSON = Path(__file__).resolve().parent / "default_risk_data.json"
@@ -86,7 +87,7 @@ def _make_category_bars(df: pd.DataFrame) -> go.Figure:
     return fig
 
 
-def _metrics_table(df: pd.DataFrame) -> dash_table.DataTable:
+def metrics_table(df: pd.DataFrame) -> dash_table.DataTable:
     columns = [
         {"name": "Metric", "id": "metric"},
         {"name": "Score Input", "id": "value_display"},
@@ -113,7 +114,7 @@ def _metrics_table(df: pd.DataFrame) -> dash_table.DataTable:
     )
 
 
-def _load_scores(suburb_name: Optional[str], json_file: Optional[str] = None) -> Tuple[float, pd.DataFrame, pd.DataFrame]:
+def load_scores(suburb_name, json_file=None):
     """Load scores from API or specified JSON file
 
     Args:
@@ -201,7 +202,7 @@ def create_app() -> Dash:
                 className="metrics",
                 children=[
                     html.H2("Source Metrics"),
-                    _metrics_table(pd.DataFrame()),
+                    metrics_table(pd.DataFrame()),
                 ],
             ),
         ],
@@ -219,16 +220,18 @@ def create_app() -> Dash:
     )
     def update_dashboard(_: int, suburb_name: str, json_file: Optional[str]):
         try:
-            suburb_param = suburb_name.strip() if suburb_name and suburb_name.strip() else None
-            overall, breakdown, metrics_df = _load_scores(suburb_param, json_file)
+            suburb_param = (
+                suburb_name.strip() if suburb_name and suburb_name.strip() else None
+            )
+            overall, breakdown, metrics_df = load_scores(suburb_param, json_file)
             error_message = ""
-        except RiskDataError as exc:
+        except ValueError as exc:
             overall, breakdown, metrics_df = 0.0, pd.DataFrame(), pd.DataFrame()
             error_message = str(exc)
 
         gauge_fig = make_gauge(overall)
         bar_fig = _make_category_bars(breakdown)
-        metrics_section = [html.H2("Source Metrics"), _metrics_table(metrics_df)]
+        metrics_section = [html.H2("Source Metrics"), metrics_table(metrics_df)]
         return gauge_fig, bar_fig, metrics_section, error_message
 
     return app

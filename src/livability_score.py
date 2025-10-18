@@ -84,10 +84,7 @@ DEFAULT_METRIC_CONFIG: Dict[str, MetricConfig] = {
 }
 
 
-def compute_scores(
-    df: pd.DataFrame,
-    metric_config: Dict[str, MetricConfig] = DEFAULT_METRIC_CONFIG,
-) -> Tuple[float, pd.DataFrame]:
+def compute_scores(df, metric_config=DEFAULT_METRIC_CONFIG,) -> Tuple[float, pd.DataFrame]:
 
     if df.empty:
         return 0.0, pd.DataFrame(columns=["category", "score", "weight"])
